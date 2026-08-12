@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mini-hermes-agent"
+version = "0.1.0"
+description = "A small project reproducing Hermes stage-one message flow."
+requires-python = ">=3.11"
+
+[project.scripts]
+mini-hermes = "hermes_cli.main:main"
+
+[tool.setuptools]
+py-modules = ["cli", "run_agent"]
+
+[tool.setuptools.packages.find]
+include = ["hermes_cli*", "agent*"]
+
