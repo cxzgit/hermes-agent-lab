@@ -10,7 +10,7 @@
 | 阶段 | 内容 | 状态 | 文档 |
 |---|---|---|---|
 | 第一阶段 | CLI 输入到 Agent 消息 | 已完成 | [stage-01-cli-message-flow.md](stage-01-cli-message-flow.md) |
-| 第二阶段 | 模型响应与 Agent 循环 | 未开始 | 待创建 |
+| 第二阶段 | 模型响应与 Agent 循环 | 已完成 | [stage-02-agent-loop.md](stage-02-agent-loop.md) |
 | 第三阶段 | 工具注册、调用与结果回传 | 未开始 | 待创建 |
 | 第四阶段 | 会话存储与恢复 | 未开始 | 待创建 |
 | 第五阶段 | Skill 加载与执行 | 未开始 | 待创建 |
