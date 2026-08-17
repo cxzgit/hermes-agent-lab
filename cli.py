@@ -6,9 +6,15 @@ from run_agent import AIAgent
 
 
 class HermesCLI:
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        model: str,
+        base_url: str,
+        client=None,
+    ) -> None:
         # Reuse one Agent throughout this CLI session.
-        self.agent = AIAgent()
+        self.agent = AIAgent(model=model, base_url=base_url, client=client)
         self.conversation_history: list[dict[str, str]] = []
 
     def run(self) -> None:
@@ -35,7 +41,10 @@ class HermesCLI:
         return response
 
 
-def main() -> None:
-    cli = HermesCLI()
+def main(
+    *,
+    model: str,
+    base_url: str,
+) -> None:
+    cli = HermesCLI(model=model, base_url=base_url)
     cli.run()
-

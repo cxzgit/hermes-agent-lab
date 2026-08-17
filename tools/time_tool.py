@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from tools.registry import registry
 
@@ -25,9 +27,12 @@ GET_CURRENT_TIME_SCHEMA = {
 
 def _handle_get_current_time(args: dict[str, Any]) -> str:
     timezone = args["timezone"]
-    # Fixed output keeps tests deterministic. A later exercise can use
-    # datetime/zoneinfo without changing the registry or Agent loop.
-    return f"{timezone} 的时间是 2026-08-13 10:00:00"
+    try:
+        timezone_info = ZoneInfo(timezone)
+    except ZoneInfoNotFoundError as exc:
+        raise ValueError(f"Unknown IANA timezone: {timezone}") from exc
+    current_time = datetime.now(timezone_info)
+    return f"{timezone} 的时间是 {current_time:%Y-%m-%d %H:%M:%S}"
 
 
 registry.register(
@@ -36,4 +41,3 @@ registry.register(
     schema=GET_CURRENT_TIME_SCHEMA,
     handler=_handle_get_current_time,
 )
-

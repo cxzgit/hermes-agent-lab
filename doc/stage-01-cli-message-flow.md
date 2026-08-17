@@ -26,7 +26,7 @@ PowerShell 输入 mini-hermes
 → build_turn_context()
 → 构造 {"role": "user", "content": "..."}
 → 加入 messages
-→ 调用模型（mini 项目中为 fake_model）
+→ 调用 OpenAI Responses API（测试中注入 Mock Client）
 → 加入 assistant 消息
 → 保存历史
 → CLI 显示回答
@@ -42,7 +42,7 @@ PowerShell 输入 mini-hermes
 | Agent 公共入口 | `run_agent.AIAgent` | `run_agent.AIAgent` |
 | 对话循环 | `agent/conversation_loop.py` | `agent/conversation_loop.py` |
 | 本轮上下文 | `agent/turn_context.py` | `agent/turn_context.py` |
-| 模型调用 | 多 Provider 传输层 | `fake_model()` |
+| 模型调用 | 多 Provider 传输层 | OpenAI Responses Client |
 
 ## Mini 项目各文件的职责
 
@@ -141,7 +141,7 @@ mini-hermes
 第二轮应看到类似日志：
 
 ```text
-[6] conversation_loop sends 3 message(s) to fake_model
+[6] conversation_loop sends 3 message(s) to openai
 ```
 
 这三条消息是第一轮 User、第一轮 Assistant 和第二轮 User。
@@ -164,7 +164,7 @@ python -m unittest discover -s tests -v
 3. `cli.py` 的 `HermesCLI.chat()`
 4. `run_agent.py` 的 `AIAgent.run_conversation()`
 5. `agent/turn_context.py` 的 `build_turn_context()`
-6. `agent/conversation_loop.py` 的 `fake_model()`
+6. `run_agent.py` 的 `_perform_api_call()`
 
 单步观察以下变量：
 
@@ -185,4 +185,3 @@ user_input
 3. 用户字符串如何变成 `{"role": "user", "content": "..."}`。
 4. 为什么第二轮模型请求中包含第一轮消息。
 5. 为什么 Agent 的公开入口和对话循环实现分布在不同文件中。
-

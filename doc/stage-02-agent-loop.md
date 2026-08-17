@@ -32,7 +32,7 @@ messages
 | 文件 | 第二阶段职责 |
 |---|---|
 | `agent/conversation_loop.py` | 实现有次数限制的 Agent 循环和两条响应分支 |
-| `fake_model()` | 模拟标准化后的模型响应，包括 `content`、`tool_calls` 和 `finish_reason` |
+| 测试 Mock Client | 在单元测试中提供标准化前的 Responses 响应，不进入运行时代码 |
 | `execute_tool_call()` | 临时执行教学工具；第三阶段会替换成工具注册系统 |
 | `tests/test_stage_two.py` | 验证普通响应只调用模型一次，工具响应会调用两次 |
 
@@ -135,4 +135,3 @@ python -m unittest discover -s tests -v
 3. 为什么工具结果前必须存在 Assistant 工具请求。
 4. `tool_call_id` 有什么作用。
 5. 工具执行后为什么使用 `continue`，最终文本后为什么使用 `break`。
-

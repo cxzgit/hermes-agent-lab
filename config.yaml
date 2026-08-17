@@ -1,0 +1,4 @@
+# Non-secret runtime settings belong here. Secrets belong in .env.
+model:
+  name: deepseek-v4-flash
+  base_url: https://api.deepseek.com

@@ -1,4 +1,6 @@
 import unittest
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from model_tools import get_tool_definitions, handle_function_call
 from tools.registry import ToolRegistry
@@ -11,10 +13,19 @@ class StageThreeTests(unittest.TestCase):
         self.assertIn("get_current_time", names)
 
     def test_dispatch_finds_registered_handler(self) -> None:
+        zone = ZoneInfo("Asia/Shanghai")
+        before = datetime.now(zone).replace(microsecond=0)
         result = handle_function_call(
             "get_current_time", {"timezone": "Asia/Shanghai"}
         )
-        self.assertEqual(result, "Asia/Shanghai 的时间是 2026-08-13 10:00:00")
+        after = datetime.now(zone).replace(microsecond=0)
+        prefix = "Asia/Shanghai 的时间是 "
+        self.assertTrue(result.startswith(prefix))
+        returned = datetime.strptime(
+            result.removeprefix(prefix), "%Y-%m-%d %H:%M:%S"
+        ).replace(tzinfo=zone)
+        self.assertLessEqual(before, returned)
+        self.assertLessEqual(returned, after)
 
     def test_unknown_tool_returns_error(self) -> None:
         self.assertEqual(
@@ -39,4 +50,3 @@ class StageThreeTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

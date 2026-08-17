@@ -35,7 +35,7 @@ registry.get_definitions()
 | 文件 | 职责 |
 |---|---|
 | `tools/registry.py` | 保存工具条目、输出 Schema、按名称分发 Handler |
-| `tools/time_tool.py` | 定义时间工具的 Schema、Handler 并完成注册 |
+| `tools/time_tool.py` | 使用 `datetime + zoneinfo` 查询真实 IANA 时区时间并完成注册 |
 | `model_tools.py` | 工具系统的薄编排层，负责发现、Schema 查询和调用分发 |
 | `agent/tool_executor.py` | 解析模型参数、调用工具并构造 Tool 消息 |
 | `agent/conversation_loop.py` | 只负责 Agent 控制流，不再认识具体工具实现 |
@@ -97,7 +97,7 @@ return entry.handler(args)
     "role": "tool",
     "name": "get_current_time",
     "tool_call_id": "call_get_current_time_1",
-    "content": "Asia/Shanghai 的时间是 2026-08-13 10:00:00",
+    "content": "Asia/Shanghai 的时间是 <调用时的真实时间>",
 }
 ```
 
@@ -118,4 +118,3 @@ python -m unittest discover -s tests -v
 3. `get_tool_definitions()` 如何让模型知道工具存在。
 4. `registry.dispatch()` 如何根据名称找到 Handler。
 5. 为什么新增工具不应该修改 `conversation_loop.py`。
-

@@ -1,7 +1,7 @@
-# Mini Hermes：阶段一复现
+# Mini Hermes：分阶段复现
 
-这个项目复现 Hermes 第一阶段：读取命令行消息，把它转换成模型消息字典，
-交给 Agent，并在多轮聊天中保留历史。
+这个项目分阶段复现 Hermes Agent 的 CLI、Agent Loop、工具系统和真实 OpenAI
+Responses API。
 
 ## 调用链
 
@@ -16,11 +16,12 @@ pyproject.toml: mini-hermes
   -> agent.conversation_loop.run_conversation()
   -> build_turn_context()
   -> {"role": "user", "content": "..."}
-  -> fake_model()
+  -> ResponsesApiTransport
+  -> OpenAI Responses Client
+  -> NormalizedResponse
 ```
 
-`fake_model()` 代替真实模型 API，让你免费且稳定地观察数据流。阶段一不包含
-工具、数据库、流式输出和复杂配置。
+单元测试通过注入 Mock Client 保持免费、稳定；运行时只保留真实 OpenAI Client。
 
 ## 运行
 
@@ -47,7 +48,7 @@ python -m hermes_cli.main
 3. `cli.py` 的 `HermesCLI.chat()`
 4. `run_agent.py` 的 `AIAgent.run_conversation()`
 5. `agent/turn_context.py` 的 `build_turn_context()`
-6. `agent/conversation_loop.py` 的 `fake_model()`
+6. `run_agent.py` 的 `_perform_api_call()`
 
 单步观察 `user_input`、`user_message`、`user_msg` 和 `messages`。
 

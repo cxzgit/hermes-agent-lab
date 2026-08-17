@@ -1,7 +1,23 @@
 import unittest
+from types import SimpleNamespace
 
 from agent.turn_context import build_turn_context
 from cli import HermesCLI
+
+
+class TextResponses:
+    def create(self, **kwargs):
+        user_text = kwargs["input"][-1]["content"]
+        text = f"我收到了：{user_text}"
+        part = SimpleNamespace(type="output_text", text=text)
+        message = SimpleNamespace(type="message", content=[part])
+        return SimpleNamespace(
+            output=[message], output_text=text, status="completed", usage=None
+        )
+
+
+def text_client():
+    return SimpleNamespace(responses=TextResponses())
 
 
 class StageOneTests(unittest.TestCase):
@@ -12,7 +28,11 @@ class StageOneTests(unittest.TestCase):
         self.assertEqual(context.messages[-1], {"role": "user", "content": "hello"})
 
     def test_cli_reuses_history_between_turns(self) -> None:
-        cli = HermesCLI()
+        cli = HermesCLI(
+            model="test-model",
+            base_url="https://example.test/v1",
+            client=text_client(),
+        )
         cli.chat("first")
         cli.chat("second")
         self.assertEqual(
