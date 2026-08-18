@@ -1,7 +1,7 @@
 # Mini Hermes：分阶段复现
 
-这个项目分阶段复现 Hermes Agent 的 CLI、Agent Loop、工具系统和真实 OpenAI
-Responses API。
+这个项目分阶段复现 Hermes Agent 的 CLI、Agent Loop、工具系统、真实 OpenAI
+Responses API，以及基于 SQLite 的会话存储与恢复。
 
 ## 调用链
 
@@ -19,6 +19,9 @@ pyproject.toml: mini-hermes
   -> ResponsesApiTransport
   -> OpenAI Responses Client
   -> NormalizedResponse
+  -> AIAgent._persist_session()
+  -> SessionDB.append_messages_batch()
+  -> .mini-hermes/state.db
 ```
 
 单元测试通过注入 Mock Client 保持免费、稳定；运行时只保留真实 OpenAI Client。
@@ -35,6 +38,12 @@ mini-hermes
 
 ```powershell
 python -m hermes_cli.main
+```
+
+启动时会显示当前 `session_id`。退出后可以恢复原会话：
+
+```powershell
+mini-hermes --resume <session_id>
 ```
 
 `pyproject.toml` 中仍然声明了 `mini-hermes = "hermes_cli.main:main"`，用于
@@ -58,4 +67,5 @@ python -m hermes_cli.main
 python -m unittest discover -s tests -v
 ```
 
-测试验证：复制历史不会修改原列表，以及两轮聊天会复用历史。
+测试验证：历史复制、Agent Loop、工具系统、真实 Responses API 请求结构、
+SQLite 批量事务回滚，以及重新创建 CLI 后恢复原会话。

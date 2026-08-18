@@ -1,4 +1,6 @@
 import unittest
+import tempfile
+from pathlib import Path
 from types import SimpleNamespace
 
 from agent.turn_context import build_turn_context
@@ -28,22 +30,25 @@ class StageOneTests(unittest.TestCase):
         self.assertEqual(context.messages[-1], {"role": "user", "content": "hello"})
 
     def test_cli_reuses_history_between_turns(self) -> None:
-        cli = HermesCLI(
-            model="test-model",
-            base_url="https://example.test/v1",
-            client=text_client(),
-        )
-        cli.chat("first")
-        cli.chat("second")
-        self.assertEqual(
-            cli.conversation_history,
-            [
-                {"role": "user", "content": "first"},
-                {"role": "assistant", "content": "我收到了：first"},
-                {"role": "user", "content": "second"},
-                {"role": "assistant", "content": "我收到了：second"},
-            ],
-        )
+        with tempfile.TemporaryDirectory() as directory:
+            cli = HermesCLI(
+                model="test-model",
+                base_url="https://example.test/v1",
+                client=text_client(),
+                db_path=Path(directory) / "state.db",
+            )
+            cli.chat("first")
+            cli.chat("second")
+            self.assertEqual(
+                cli.conversation_history,
+                [
+                    {"role": "user", "content": "first"},
+                    {"role": "assistant", "content": "我收到了：first"},
+                    {"role": "user", "content": "second"},
+                    {"role": "assistant", "content": "我收到了：second"},
+                ],
+            )
+            cli.close()
 
 
 if __name__ == "__main__":

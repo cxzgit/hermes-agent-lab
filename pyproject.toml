@@ -18,7 +18,7 @@ dependencies = [
 mini-hermes = "hermes_cli.main:main"
 
 [tool.setuptools]
-py-modules = ["cli", "run_agent", "model_tools"]
+py-modules = ["cli", "run_agent", "model_tools", "hermes_state"]
 
 [tool.setuptools.packages.find]
 include = ["hermes_cli*", "agent*", "tools*"]

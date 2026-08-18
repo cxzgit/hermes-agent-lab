@@ -8,14 +8,19 @@ import argparse
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="mini-hermes")
     parser.add_argument("command", nargs="?", choices=("chat",))
+    parser.add_argument(
+        "--resume",
+        metavar="SESSION_ID",
+        help="resume a previously persisted conversation",
+    )
     return parser
 
 
-def cmd_chat(*, model: str, base_url: str) -> None:
+def cmd_chat(*, model: str, base_url: str, session_id: str | None = None) -> None:
     print("[1] hermes_cli.main.cmd_chat -> cli.main")
     from cli import main as cli_main
 
-    cli_main(model=model, base_url=base_url)
+    cli_main(model=model, base_url=base_url, session_id=session_id)
 
 
 def main() -> None:
@@ -28,6 +33,7 @@ def main() -> None:
         cmd_chat(
             model=settings.name,
             base_url=settings.base_url,
+            session_id=args.resume,
         )
 
 

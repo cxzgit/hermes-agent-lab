@@ -6,6 +6,7 @@ import os
 from typing import Any
 
 from agent.transports.codex import ResponsesApiTransport
+from hermes_state import SessionDB
 from model_tools import get_tool_definitions
 
 
@@ -17,6 +18,8 @@ class AIAgent:
         base_url: str,
         api_key: str | None = None,
         client: Any = None,
+        session_db: SessionDB | None = None,
+        session_id: str | None = None,
     ) -> None:
         self.provider = "openai"
         self.model = model
@@ -28,6 +31,8 @@ class AIAgent:
         }
         self.transport = ResponsesApiTransport()
         self.client = client or self._create_client(api_key)
+        self._session_db = session_db
+        self.session_id = session_id
 
     def _create_client(self, api_key: str | None) -> Any:
         resolved_key = api_key or os.getenv("OPENAI_API_KEY")
@@ -67,8 +72,26 @@ class AIAgent:
         print("[4] AIAgent.run_conversation -> agent.conversation_loop")
         from agent.conversation_loop import run_conversation
 
-        return run_conversation(
+        history_size = len(conversation_history or [])
+        result = run_conversation(
             self,
             user_message=user_message,
             conversation_history=conversation_history,
         )
+        self._persist_session(result["messages"], history_size)
+        return result
+
+    def _persist_session(
+        self,
+        messages: list[dict[str, Any]],
+        history_size: int,
+    ) -> None:
+        """Persist only the messages added by the current Agent turn."""
+        if self._session_db is None or self.session_id is None:
+            return
+        pending_messages = messages[history_size:]
+        inserted = self._session_db.append_messages_batch(
+            self.session_id,
+            pending_messages,
+        )
+        print(f"[10] persisted {inserted} new message(s) to SQLite")
