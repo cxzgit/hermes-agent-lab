@@ -39,6 +39,20 @@ class ScriptedResponses:
         )
 
 
+class AlwaysToolResponses:
+    def create(self, **kwargs):
+        call = SimpleNamespace(
+            type="function_call",
+            id="fc_loop",
+            call_id="call_loop",
+            name="get_current_time",
+            arguments=json.dumps({"timezone": "Asia/Shanghai"}),
+        )
+        return SimpleNamespace(
+            output=[call], output_text="", status="completed", usage=None
+        )
+
+
 def scripted_agent():
     return AIAgent(
         model="test-model",
@@ -48,6 +62,28 @@ def scripted_agent():
 
 
 class StageTwoTests(unittest.TestCase):
+    def test_iteration_limit_is_configurable(self) -> None:
+        agent = AIAgent(
+            model="test-model",
+            base_url="https://example.test/v1",
+            client=SimpleNamespace(responses=AlwaysToolResponses()),
+            max_iterations=2,
+        )
+
+        result = agent.run_conversation("keep using tools")
+
+        self.assertEqual(agent.max_iterations, 2)
+        self.assertEqual(result["api_calls"], 2)
+
+    def test_iteration_limit_must_be_positive(self) -> None:
+        with self.assertRaises(ValueError):
+            AIAgent(
+                model="test-model",
+                base_url="https://example.test/v1",
+                client=SimpleNamespace(responses=ScriptedResponses()),
+                max_iterations=0,
+            )
+
     def test_plain_response_finishes_after_one_model_call(self) -> None:
         result = scripted_agent().run_conversation("hello")
         self.assertEqual(result["api_calls"], 1)

@@ -5,6 +5,11 @@ from __future__ import annotations
 from pathlib import Path
 from uuid import uuid4
 
+from agent.skill_commands import (
+    DEFAULT_SKILLS_DIR,
+    build_skill_invocation_message,
+    scan_skill_commands,
+)
 from hermes_state import SessionDB
 from run_agent import AIAgent
 
@@ -18,7 +23,9 @@ class HermesCLI:
         client=None,
         db_path: Path | str | None = None,
         session_id: str | None = None,
+        skills_dir: Path | str = DEFAULT_SKILLS_DIR,
     ) -> None:
+        self.skill_commands = scan_skill_commands(skills_dir)
         self._session_db = SessionDB(db_path)
         if session_id is None:
             self.session_id = uuid4().hex
@@ -56,12 +63,26 @@ class HermesCLI:
                 if user_input == "/quit":
                     print("Bye.")
                     return
-                self.chat(user_input)
+                self.chat(self.prepare_user_input(user_input))
         finally:
             self.close()
 
     def close(self) -> None:
         self._session_db.close()
+
+    def prepare_user_input(self, message: str) -> str:
+        """Expand an installed ``/skill`` command into normal user content."""
+        command, _, instruction = message.partition(" ")
+        command = command.replace("_", "-")
+        skill_message = build_skill_invocation_message(
+            command,
+            instruction.strip(),
+            self.skill_commands,
+        )
+        if skill_message is None:
+            return message
+        print(f"[skill] loaded: {self.skill_commands[command]['name']}")
+        return skill_message
 
     def chat(self, message: str) -> str:
         print(f"[3] HermesCLI.chat received: {message!r}")

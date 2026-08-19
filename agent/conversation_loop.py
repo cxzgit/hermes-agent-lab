@@ -18,7 +18,7 @@ def run_conversation(
     final_response = ""
     api_call_count = 0
 
-    while api_call_count < 3:
+    while api_call_count < agent.max_iterations:
         api_call_count += 1
         print(
             f"[6] loop #{api_call_count}: sending {len(messages)} message(s) "

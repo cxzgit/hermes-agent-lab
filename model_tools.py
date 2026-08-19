@@ -9,6 +9,8 @@ from tools.registry import registry
 
 def discover_builtin_tools() -> None:
     # Importing a tool module triggers its module-level registry.register().
+    import tools.file_tools  # noqa: F401
+    import tools.skills_tool  # noqa: F401
     import tools.time_tool  # noqa: F401
 
 
@@ -21,4 +23,3 @@ def get_tool_definitions() -> list[dict[str, Any]]:
 
 def handle_function_call(function_name: str, function_args: dict[str, Any]) -> str:
     return registry.dispatch(function_name, function_args)
-

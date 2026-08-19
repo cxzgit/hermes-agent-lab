@@ -2,8 +2,8 @@
 
 这是一个用于学习 [Hermes Agent](https://github.com/NousResearch/hermes-agent)
 核心工作原理的精简实现。项目按照真实 Hermes Agent 的主要目录和调用关系，
-逐阶段复现 CLI、Agent Loop、工具调用、OpenAI Responses API，以及基于 SQLite
-的会话持久化与恢复。
+逐阶段复现 CLI、Agent Loop、工具调用、OpenAI Responses API、基于 SQLite
+的会话持久化与恢复，以及 Skill 的按需加载。
 
 它不是 Hermes Agent 的替代品，而是一个可以单步调试、阅读和修改的学习项目。
 
@@ -14,6 +14,7 @@
 3. 工具注册、Schema 生成与工具执行
 4. 真实 OpenAI Responses API 与响应标准化
 5. SQLite 会话存储、事务写入与 `--resume` 恢复
+6. Skill 扫描、安全读取与 Slash Command 调用
 
 ## 调用链
 
@@ -34,6 +35,19 @@ pyproject.toml: mini-hermes
   -> AIAgent._persist_session()
   -> SessionDB.append_messages_batch()
   -> .mini-hermes/state.db
+```
+
+Skill 调用复用同一条聊天链：
+
+```text
+/explain-code <任务>
+  -> scan_skill_commands()
+  -> build_skill_invocation_message()
+  -> skill_view()
+  -> 完整 SKILL.md + 用户任务
+  -> HermesCLI.chat()
+  -> {"role": "user", "content": "..."}
+  -> read_file() 按需读取项目源码
 ```
 
 单元测试通过注入 Mock Client 保持免费、稳定；正常运行只使用真实 OpenAI
@@ -91,6 +105,12 @@ python -m hermes_cli.main
 mini-hermes --resume <session_id>
 ```
 
+调用内置示例 Skill：
+
+```text
+/explain-code 请解释 hermes_state.py 中的事务代码
+```
+
 数据库默认保存在：
 
 ```text
@@ -125,7 +145,13 @@ python -m unittest discover -s tests -v
 ```
 
 测试验证：历史复制、Agent Loop、工具系统、真实 Responses API 请求结构、
-SQLite 批量事务回滚，以及重新创建 CLI 后恢复原会话。
+SQLite 批量事务回滚、会话恢复、Skill 扫描、路径安全和 Skill 用户消息注入。
+
+当前向模型暴露三个工具：`read_file`、`skill_view` 和 `get_current_time`。
+`read_file` 只能完整读取 Mini Hermes 项目目录中的 UTF-8 文本文件。
+
+一次用户回合默认最多调用模型 `10` 轮，由 `AIAgent.max_iterations` 控制；
+它限制的是 API 迭代轮数，不是工具数量。
 
 ## 学习文档
 

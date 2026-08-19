@@ -100,6 +100,19 @@ continue  工具结果已经产生，回到循环开头再次调用模型
 
 这是第二阶段最重要的控制流区别。
 
+## 最大迭代次数
+
+Mini Hermes 通过 `AIAgent.max_iterations` 控制一次用户回合最多调用模型多少轮，
+默认值为 `10`：
+
+```python
+while api_call_count < agent.max_iterations:
+```
+
+这个数值不是工具数量。一轮模型响应可以并行请求多个工具，但只增加一次
+`api_call_count`。真实 Hermes 当前默认值为 `90`，并额外受到共享迭代预算、
+中断和 grace call 控制；Mini 使用较小默认值以限制学习时的 API 消耗。
+
 ## 运行观察
 
 ```powershell

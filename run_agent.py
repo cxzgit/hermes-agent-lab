@@ -20,7 +20,10 @@ class AIAgent:
         client: Any = None,
         session_db: SessionDB | None = None,
         session_id: str | None = None,
+        max_iterations: int = 10,
     ) -> None:
+        if max_iterations < 1:
+            raise ValueError("max_iterations must be at least 1")
         self.provider = "openai"
         self.model = model
         self.base_url = base_url
@@ -33,6 +36,7 @@ class AIAgent:
         self.client = client or self._create_client(api_key)
         self._session_db = session_db
         self.session_id = session_id
+        self.max_iterations = max_iterations
 
     def _create_client(self, api_key: str | None) -> Any:
         resolved_key = api_key or os.getenv("OPENAI_API_KEY")
