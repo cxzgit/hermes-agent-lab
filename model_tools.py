@@ -12,6 +12,10 @@ def discover_builtin_tools() -> None:
     import tools.file_tools  # noqa: F401
     import tools.skills_tool  # noqa: F401
     import tools.time_tool  # noqa: F401
+    # Plugins extend the registry through a controlled PluginContext.
+    from hermes_cli.plugins import discover_plugins
+
+    discover_plugins()
 
 
 discover_builtin_tools()

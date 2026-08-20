@@ -15,6 +15,7 @@
 4. 真实 OpenAI Responses API 与响应标准化
 5. SQLite 会话存储、事务写入与 `--resume` 恢复
 6. Skill 扫描、安全读取与 Slash Command 调用
+7. Plugin manifest、`register(ctx)` 与插件工具注册
 
 ## 调用链
 
@@ -147,7 +148,8 @@ python -m unittest discover -s tests -v
 测试验证：历史复制、Agent Loop、工具系统、真实 Responses API 请求结构、
 SQLite 批量事务回滚、会话恢复、Skill 扫描、路径安全和 Skill 用户消息注入。
 
-当前向模型暴露三个工具：`read_file`、`skill_view` 和 `get_current_time`。
+当前向模型暴露内置工具以及示例插件工具 `plugin_repeat`；插件工具通过
+`plugin.yaml` 和 `register(ctx)` 加载，最终进入同一个工具注册表。
 `read_file` 只能完整读取 Mini Hermes 项目目录中的 UTF-8 文本文件。
 
 一次用户回合默认最多调用模型 `10` 轮，由 `AIAgent.max_iterations` 控制；

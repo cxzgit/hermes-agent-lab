@@ -12,7 +12,7 @@
 | 第四阶段 | Responses API 与真实模型 Provider | 已完成 | [stage-04-real-model-provider.md](stage-04-real-model-provider.md) |
 | 第五阶段 | 会话存储与恢复 | 已完成 | [stage-05-session-storage.md](stage-05-session-storage.md) |
 | 第六阶段 | Skill 加载与执行 | 已完成 | [stage-06-skills.md](stage-06-skills.md) |
-| 第七阶段 | Plugin 扩展机制 | 未开始 | 待创建 |
+| 第七阶段 | Plugin 扩展机制 | 已完成 | [stage-07-plugins.md](stage-07-plugins.md) |
 
 ## 总体学习路线
 

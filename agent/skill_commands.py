@@ -61,7 +61,7 @@ def scan_skill_commands(
                  if line.strip() and not line.lstrip().startswith("#")),
                 f"Invoke the {name} skill",
             )
-            command = f"/{slug}"
+        command = f"/{slug}"
         if command in commands:
             raise ValueError(f"Duplicate Skill command: {command}")
         commands[command] = {
